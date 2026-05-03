@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sweta Jha | CS Student & Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --p:#7c3aed;--pl:#a78bfa;--pd:#4c1d95;
+  --c:#06b6d4;--cl:#67e8f9;--cd:#0e7490;
+  --bg:#04040f;--bg2:#080818;--bg3:#0c0c22;
+  --text:#e8e8f0;--muted:#8892a4;--faint:#4a5060;
+  --border:rgba(124,58,237,0.2);--borderc:rgba(6,182,212,0.18)
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none}
+
+/* ── custom cursor ── */
+#cur{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--cl);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;transition:transform .1s}
+#cur-r{position:fixed;width:32px;height:32px;border-radius:50%;border:1px solid rgba(167,139,250,.5);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .16s ease}
+
+/* ── canvas bg ── */
+#cvs{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ── nav ── */
+nav{position:fixed;top:0;width:100%;z-index:200;padding:1.1rem 5rem;display:flex;align-items:center;justify-content:space-between;background:rgba(4,4,15,.75);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+.logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1.15rem;background:linear-gradient(120deg,var(--pl),var(--cl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:3px}
+.nav-links{display:flex;gap:2.2rem;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;transition:color .3s}
+.nav-links a:hover{color:var(--cl)}
+
+/* ── hero ── */
+#hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:0 5rem;z-index:1;overflow:hidden}
+.hero-blob{position:absolute;right:-5%;top:40%;transform:translateY(-50%);width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.1) 0%,rgba(6,182,212,.04) 55%,transparent 75%);animation:breathe 7s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:translateY(-50%) scale(1)}50%{transform:translateY(-50%) scale(1.08)}}
+.hero-content{max-width:680px;z-index:2}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:4px;color:var(--cl);text-transform:uppercase;margin-bottom:1.4rem;opacity:0;animation:rise .9s .1s forwards}
+.hero-name{font-family:'Orbitron',monospace;line-height:1.0;margin-bottom:1.2rem;opacity:0;animation:rise .9s .3s forwards}
+.name-first{display:block;font-size:clamp(3.2rem,5.5vw,5rem);font-weight:400;color:rgba(232,232,240,.85);letter-spacing:4px}
+.name-last{display:block;font-size:clamp(3.8rem,7vw,6.5rem);font-weight:900;background:linear-gradient(120deg,var(--pl) 20%,var(--cl) 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px}
+.hero-role{font-size:1.05rem;color:var(--muted);margin-bottom:.6rem;opacity:0;animation:rise .9s .5s forwards;font-weight:300}
+.hero-tw{font-family:'JetBrains Mono',monospace;font-size:.88rem;color:var(--cl);margin-bottom:2.5rem;opacity:0;animation:rise .9s .7s forwards;min-height:1.4rem}
+.blink{animation:bl 1s step-end infinite}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:0}}
+.hero-cta{display:flex;gap:1rem;opacity:0;animation:rise .9s .9s forwards}
+.btn-fill{padding:.8rem 2rem;background:linear-gradient(120deg,var(--p),var(--cd));color:#fff;border:none;border-radius:50px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:.88rem;cursor:pointer;text-decoration:none;transition:transform .3s,box-shadow .3s;letter-spacing:.5px}
+.btn-fill:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(124,58,237,.35)}
+.btn-ghost{padding:.8rem 2rem;background:transparent;color:var(--cl);border:1px solid rgba(6,182,212,.4);border-radius:50px;font-family:'DM Sans',sans-serif;font-weight:500;font-size:.88rem;cursor:pointer;text-decoration:none;transition:all .3s}
+.btn-ghost:hover{background:rgba(6,182,212,.08);transform:translateY(-3px)}
+.hero-quick{display:flex;gap:2rem;margin-top:4rem;opacity:0;animation:rise .9s 1.1s forwards}
+.hq{display:flex;align-items:center;gap:.6rem;font-size:.78rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.hq-dot{width:6px;height:6px;border-radius:50%}
+.dot-p{background:var(--pl);box-shadow:0 0 8px var(--p)}
+.dot-c{background:var(--cl);box-shadow:0 0 8px var(--c)}
+/* orbit */
+.orbit-wrap{position:absolute;right:6%;top:50%;transform:translateY(-50%);width:380px;height:380px}
+.o-ring{position:absolute;border-radius:50%;border:1px solid;animation:spin linear infinite}
+.r1{width:100%;height:100%;top:0;left:0;border-color:rgba(124,58,237,.25);animation-duration:22s}
+.r2{width:68%;height:68%;top:16%;left:16%;border-color:rgba(6,182,212,.2);animation-duration:15s;animation-direction:reverse}
+.r3{width:38%;height:38%;top:31%;left:31%;border-color:rgba(167,139,250,.3);animation-duration:9s}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.o-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--pd),var(--cd));display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:.9rem;font-weight:900;color:#fff}
+.o-dot{position:absolute;width:9px;height:9px;border-radius:50%;top:50%;left:-4.5px;margin-top:-4.5px}
+
+/* ── sections ── */
+section{position:relative;z-index:1;padding:6rem 5rem}
+.sec-head{text-align:center;margin-bottom:4rem}
+.sec-tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:4px;color:var(--cl);text-transform:uppercase;margin-bottom:.7rem}
+.sec-title{font-family:'Orbitron',monospace;font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:700;letter-spacing:1px}
+.sec-title em{font-style:normal;background:linear-gradient(120deg,var(--pl),var(--cl));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sec-rule{width:48px;height:2px;background:linear-gradient(90deg,var(--p),var(--c));margin:1rem auto 0;border-radius:2px}
+
+/* ── about ── */
+#about{background:linear-gradient(180deg,transparent,rgba(124,58,237,.03) 50%,transparent)}
+.about-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:5rem;align-items:start;max-width:1080px;margin:0 auto}
+.code-card{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:20px;padding:2rem;position:relative;overflow:hidden}
+.code-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,var(--pl),var(--cl),transparent)}
+.code-dots{display:flex;gap:.4rem;margin-bottom:1.2rem}
+.cd{width:10px;height:10px;border-radius:50%}
+.cd1{background:#ff5f56}.cd2{background:#ffbd2e}.cd3{background:#27c93f}
+.code-body{font-family:'JetBrains Mono',monospace;font-size:.75rem;line-height:2;color:var(--muted)}
+.ck{color:var(--pl)}.cs{color:var(--cl)}.co{color:#f97316}.cm{color:var(--faint);font-style:italic}
+.about-text{}
+.about-text h3{font-family:'Orbitron',monospace;font-size:1.4rem;color:var(--pl);margin-bottom:1.2rem;letter-spacing:1px}
+.about-text p{color:var(--muted);line-height:1.85;font-size:.93rem;margin-bottom:1.2rem;font-weight:300}
+.about-text p strong{color:var(--text);font-weight:500}
+.pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+.pill{padding:.35rem .9rem;border-radius:50px;font-size:.72rem;letter-spacing:.5px;font-weight:500}
+.pill-p{background:rgba(124,58,237,.12);border:1px solid rgba(167,139,250,.3);color:var(--pl)}
+.pill-c{background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.25);color:var(--cl)}
+
+/* ── skills ── */
+#skills{background:linear-gradient(180deg,transparent,rgba(6,182,212,.03) 50%,transparent)}
+.skills-wrap{max-width:1080px;margin:0 auto}
+.skill-group{margin-bottom:2.5rem}
+.sg-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:1rem;padding-left:.5rem;border-left:2px solid var(--p)}
+.skill-row{display:flex;flex-wrap:wrap;gap:.7rem}
+.skill-chip{display:flex;align-items:center;gap:.5rem;padding:.5rem 1.1rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;font-size:.8rem;color:var(--text);font-family:'JetBrains Mono',monospace;transition:all .3s;cursor:default}
+.skill-chip:hover{border-color:rgba(167,139,250,.45);background:rgba(124,58,237,.08);transform:translateY(-2px)}
+.chip-dot{width:6px;height:6px;border-radius:50%}
+.cdp{background:var(--pl)}.cdc{background:var(--cl)}.cdg{background:#4ade80}.cdo{background:#f97316}
+
+/* ── projects ── */
+#projects{background:rgba(0,0,0,.15)}
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.8rem;max-width:1080px;margin:0 auto}
+.proj-card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:22px;padding:2rem;position:relative;overflow:hidden;transition:all .4s;display:flex;flex-direction:column}
+.proj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--pl),var(--cl),transparent);opacity:0;transition:opacity .4s}
+.proj-card:hover{transform:translateY(-7px);border-color:rgba(167,139,250,.38);box-shadow:0 24px 60px rgba(0,0,0,.4)}
+.proj-card:hover::before{opacity:1}
+.proj-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.8rem}
+.proj-idx{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:3px;color:var(--pl);opacity:.6}
+.proj-badge{font-size:.65rem;padding:.2rem .6rem;border-radius:4px;font-family:'JetBrains Mono',monospace;letter-spacing:.5px}
+.badge-web{background:rgba(124,58,237,.15);color:var(--pl);border:1px solid rgba(124,58,237,.3)}
+.badge-hw{background:rgba(6,182,212,.1);color:var(--cl);border:1px solid rgba(6,182,212,.25)}
+.proj-card h3{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;margin-bottom:.7rem;color:var(--text);letter-spacing:.5px}
+.proj-card p{color:var(--muted);font-size:.85rem;line-height:1.75;margin-bottom:1.4rem;flex:1;font-weight:300}
+.proj-techs{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1.4rem}
+.tech{font-family:'JetBrains Mono',monospace;font-size:.63rem;padding:.18rem .6rem;border-radius:4px;letter-spacing:.3px}
+.tech-p{background:rgba(124,58,237,.12);color:var(--pl);border:1px solid rgba(124,58,237,.2)}
+.tech-c{background:rgba(6,182,212,.08);color:var(--cl);border:1px solid rgba(6,182,212,.18)}
+.proj-foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.05);padding-top:1rem}
+.proj-link{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--cl);text-decoration:none;letter-spacing:2px;text-transform:uppercase;transition:all .3s;display:flex;align-items:center;gap:.4rem}
+.proj-link:hover{gap:.8rem}
+.proj-highlight{font-size:.68rem;color:var(--muted);font-style:italic;font-family:'DM Sans',sans-serif}
+
+/* ── experience ── */
+#experience{background:linear-gradient(180deg,transparent,rgba(124,58,237,.03) 50%,transparent)}
+.exp-wrap{max-width:780px;margin:0 auto}
+.exp-item{display:flex;gap:2rem;padding-bottom:3rem;position:relative}
+.exp-item::before{content:'';position:absolute;left:19px;top:28px;bottom:0;width:1px;background:linear-gradient(180deg,var(--p),rgba(6,182,212,.2))}
+.exp-item:last-child::before{display:none}
+.exp-dot-wrap{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:4px}
+.exp-dot{width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--c));box-shadow:0 0 14px rgba(124,58,237,.5);flex-shrink:0}
+.exp-body{flex:1;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:16px;padding:1.6rem;transition:border-color .3s}
+.exp-body:hover{border-color:rgba(167,139,250,.35)}
+.exp-meta{display:flex;align-items:center;gap:.8rem;margin-bottom:.5rem;flex-wrap:wrap}
+.exp-year{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--cl);letter-spacing:2px;background:rgba(6,182,212,.08);padding:.2rem .6rem;border-radius:4px;border:1px solid rgba(6,182,212,.2)}
+.exp-org{font-size:.72rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.exp-body h4{font-family:'Orbitron',monospace;font-size:.9rem;color:var(--text);margin-bottom:.6rem;letter-spacing:.5px}
+.exp-body p{color:var(--muted);font-size:.85rem;line-height:1.75;font-weight:300}
+.exp-body ul{list-style:none;margin-top:.5rem}
+.exp-body ul li{color:var(--muted);font-size:.83rem;line-height:1.7;padding:.15rem 0;font-weight:300;display:flex;gap:.6rem}
+.exp-body ul li::before{content:'→';color:var(--pl);flex-shrink:0;font-size:.75rem;margin-top:.1rem}
+
+/* ── certifications ── */
+#certifications{background:rgba(0,0,0,.1)}
+.cert-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.2rem;max-width:1080px;margin:0 auto}
+.cert-card{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:16px;padding:1.4rem 1.6rem;display:flex;align-items:flex-start;gap:1rem;transition:all .3s}
+.cert-card:hover{border-color:rgba(103,232,249,.35);transform:translateY(-3px)}
+.cert-icon{font-size:1.4rem;flex-shrink:0;margin-top:.1rem}
+.cert-info strong{display:block;font-size:.83rem;color:var(--text);font-weight:500;margin-bottom:.25rem;line-height:1.4}
+.cert-info span{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.5px}
+
+/* ── competitive ── */
+#competitive{background:linear-gradient(180deg,transparent,rgba(6,182,212,.025) 50%,transparent)}
+.cp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.4rem;max-width:1080px;margin:0 auto 2.5rem}
+.cp-card{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:18px;padding:2rem 1.5rem;text-align:center;transition:all .4s;position:relative;overflow:hidden}
+.cp-card:hover{transform:translateY(-5px);border-color:rgba(167,139,250,.4)}
+.cp-num{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;background:linear-gradient(120deg,var(--pl),var(--cl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.3rem}
+.cp-label{font-size:.72rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+.cp-platform{font-size:.65rem;color:var(--faint);margin-top:.3rem;font-family:'JetBrains Mono',monospace}
+.cp-links{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+.cp-link{font-family:'JetBrains Mono',monospace;font-size:.72rem;padding:.5rem 1.2rem;border-radius:8px;text-decoration:none;letter-spacing:1px;transition:all .3s}
+.cpl-p{background:rgba(124,58,237,.12);color:var(--pl);border:1px solid rgba(124,58,237,.25)}
+.cpl-p:hover{background:rgba(124,58,237,.2)}
+.cpl-c{background:rgba(6,182,212,.08);color:var(--cl);border:1px solid rgba(6,182,212,.2)}
+.cpl-c:hover{background:rgba(6,182,212,.15)}
+
+/* ── contact ── */
+#contact{background:linear-gradient(180deg,transparent,rgba(124,58,237,.05))}
+.contact-inner{max-width:700px;margin:0 auto}
+.contact-card{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:24px;padding:3rem;position:relative;overflow:hidden}
+.contact-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,var(--p),var(--c),transparent)}
+.contact-card > p{color:var(--muted);font-size:.93rem;line-height:1.8;text-align:center;margin-bottom:2.5rem;font-weight:300}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem}
+.c-link{display:flex;align-items:center;gap:.8rem;padding:.9rem 1.1rem;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all .3s}
+.c-link:hover{border-color:rgba(167,139,250,.4);background:rgba(124,58,237,.06);transform:translateY(-2px)}
+.c-icon{width:34px;height:34px;border-radius:9px;background:rgba(124,58,237,.15);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.c-info strong{display:block;font-size:.78rem;font-weight:500;margin-bottom:.1rem}
+.c-info span{font-size:.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.cform input,.cform textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:.85rem 1.1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.87rem;outline:none;transition:border-color .3s;margin-bottom:.8rem}
+.cform input:focus,.cform textarea:focus{border-color:rgba(167,139,250,.5)}
+.cform input::placeholder,.cform textarea::placeholder{color:var(--faint)}
+.cform textarea{min-height:110px;resize:vertical}
+.send-btn{width:100%;padding:.95rem;background:linear-gradient(120deg,var(--p),var(--cd));border:none;border-radius:10px;color:#fff;font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .3s}
+.send-btn:hover{opacity:.9;transform:translateY(-2px);box-shadow:0 12px 40px rgba(124,58,237,.35)}
+
+/* ── footer ── */
+footer{position:relative;z-index:1;padding:2rem 5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.foot-logo{font-family:'Orbitron',monospace;font-size:.85rem;background:linear-gradient(120deg,var(--pl),var(--cl));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.foot-copy{font-size:.72rem;color:var(--faint);font-family:'JetBrains Mono',monospace}
+
+/* ── animations ── */
+@keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.reveal.in{opacity:1;transform:translateY(0)}
+
+/* ── scrollbar ── */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--p);border-radius:2px}
+
+@media(max-width:900px){
+  nav{padding:1rem 2rem}.nav-links{gap:1rem}
+  section{padding:4rem 2rem}#hero{padding:0 2rem}
+  .orbit-wrap{display:none}.about-grid{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+  footer{padding:1.5rem 2rem;flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-r"></div>
+<canvas id="cvs"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">SJ</div>
+  <ul class="nav-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#competitive">DSA</a></li>
+    <li><a href="#resume">Resume</a></li>
+    <li><a href="#certifications">Certs</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-blob"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">// B.Tech CSE · Galgotias University · 2024–2028</p>
+    <h1 class="hero-name">
+      <span class="name-first">SWETA</span>
+      <span class="name-last">JHA</span>
+    </h1>
+    <p class="hero-role">CS Student &amp; Aspiring Full-Stack Developer</p>
+    <p class="hero-tw"><span id="tw"></span><span class="blink">_</span></p>
+    <div class="hero-cta">
+      <a class="btn-fill" href="#projects">View My Work</a>
+      <a class="btn-ghost" href="mailto:swetajhaocial11@gmail.com">Get in Touch</a>
+    </div>
+    <div class="hero-quick">
+      <div class="hq"><span class="hq-dot dot-p"></span>Java &amp; JavaScript</div>
+      <div class="hq"><span class="hq-dot dot-c"></span>MERN Stack Learner</div>
+      <div class="hq"><span class="hq-dot dot-p"></span>Robotics Enthusiast</div>
+    </div>
+  </div>
+  <div class="orbit-wrap">
+    <div class="o-ring r1"><div class="o-dot" style="background:var(--pl);box-shadow:0 0 10px var(--p)"></div></div>
+    <div class="o-ring r2"><div class="o-dot" style="background:var(--cl);box-shadow:0 0 10px var(--c)"></div></div>
+    <div class="o-ring r3"><div class="o-dot" style="background:var(--pl);box-shadow:0 0 8px var(--p)"></div></div>
+    <div class="o-center">SJ</div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="sec-head reveal">
+    <p class="sec-tag">// about_me.json</p>
+    <h2 class="sec-title">About <em>Me</em></h2>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="about-grid">
+    <div class="reveal">
+      <div class="code-card">
+        <div class="code-dots"><div class="cd cd1"></div><div class="cd cd2"></div><div class="cd cd3"></div></div>
+        <div class="code-body">
+          <div><span class="ck">const</span> <span class="co">sweta</span> = {</div>
+          <div>&nbsp;&nbsp;<span class="ck">name:</span> <span class="cs">"Sweta Jha"</span>,</div>
+          <div>&nbsp;&nbsp;<span class="ck">university:</span> <span class="cs">"Galgotias University"</span>,</div>
+          <div>&nbsp;&nbsp;<span class="ck">degree:</span> <span class="cs">"B.Tech CSE"</span>,</div>
+          <div>&nbsp;&nbsp;<span class="ck">batch:</span> <span class="cs">"2024 – 2028"</span>,</div>
+          <div>&nbsp;&nbsp;<span class="ck">location:</span> <span class="cs">"Greater Noida, India"</span>,</div>
+          <div>&nbsp;&nbsp;<span class="ck">focusAreas:</span> [</div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cs">"Full-Stack Web Dev"</span>,</div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cs">"Data Structures &amp; Algorithms"</span>,</div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cs">"Embedded Systems &amp; Robotics"</span></div>
+          <div>&nbsp;&nbsp;],</div>
+          <div>&nbsp;&nbsp;<span class="ck">status:</span> <span class="cs">"Actively learning &amp; building"</span></div>
+          <div>};</div>
+          <br>
+          <div><span class="cm">// Currently in 2nd year — just getting started</span></div>
+          <div><span class="cm">// but already shipping real projects 🚀</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="about-text reveal">
+      <h3>Hey, I'm Sweta 👋</h3>
+      <p>I'm a second-year Computer Science student at <strong>Galgotias University</strong> who loves building things — both on the web and with hardware. My journey in tech started with curiosity and a willingness to figure things out, and that hasn't changed.</p>
+      <p>I built a <strong>women's safety web app</strong> as my first real project — not for a grade, but because it mattered. I competed at <strong>IIT Techfest Zonals</strong> with an autonomous robot I assembled from scratch. These experiences taught me that the best learning happens when there's a real problem to solve.</p>
+      <p>I'm now deepening my skills in the <strong>MERN stack</strong> and DSA while contributing to the tech and entrepreneurship community on campus.</p>
+      <div class="pills">
+        <span class="pill pill-p">🔧 Problem Solver</span>
+        <span class="pill pill-c">🤖 Robotics Club</span>
+        <span class="pill pill-p">💡 E-Cell Tech Team</span>
+        <span class="pill pill-c">📈 DSA Practitioner</span>
+        <span class="pill pill-p">🌐 Web Developer</span>
+        <span class="pill pill-c">🌱 Always Learning</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="sec-head reveal">
+    <p class="sec-tag">// tech_stack.json</p>
+    <h2 class="sec-title">Skills &amp; <em>Tech</em></h2>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="skills-wrap">
+    <div class="skill-group reveal">
+      <p class="sg-label">Languages</p>
+      <div class="skill-row">
+        <div class="skill-chip"><span class="chip-dot cdp"></span>Java</div>
+        <div class="skill-chip"><span class="chip-dot cdc"></span>JavaScript</div>
+        <div class="skill-chip"><span class="chip-dot cdo"></span>Embedded C</div>
+        <div class="skill-chip"><span class="chip-dot cdp"></span>HTML5</div>
+        <div class="skill-chip"><span class="chip-dot cdc"></span>CSS3</div>
+        <div class="skill-chip"><span class="chip-dot cdp"></span>SQL</div>
+      </div>
+    </div>
+    <div class="skill-group reveal">
+      <p class="sg-label">Frameworks &amp; Libraries</p>
+      <div class="skill-row">
+        <div class="skill-chip"><span class="chip-dot cdc"></span>Node.js</div>
+        <div class="skill-chip"><span class="chip-dot cdp"></span>Express.js</div>
+        <div class="skill-chip"><span class="chip-dot cdc"></span>React.js (Learning)</div>
+        <div class="skill-chip"><span class="chip-dot cdg"></span>MongoDB</div>
+        <div class="skill-chip"><span class="chip-dot cdp"></span>MySQL</div>
+      </div>
+    </div>
+    <div class="skill-group reveal">
+      <p class="sg-label">Tools &amp; Platforms</p>
+      <div class="skill-row">
+        <div class="skill-chip"><span class="chip-dot cdo"></span>Git &amp; GitHub</div>
+        <div class="skill-chip"><span class="chip-dot cdc"></span>VS Code</div>
+        <div class="skill-chip"><span class="chip-dot cdp"></span>Arduino IDE</div>
+        <div class="skill-chip"><span class="chip-dot cdg"></span>Postman</div>
+        <div class="skill-chip"><span class="chip-dot cdo"></span>LeetCode</div>
+        <div class="skill-chip"><span class="chip-dot cdc"></span>GeeksForGeeks</div>
+      </div>
+    </div>
+    <div class="skill-group reveal">
+      <p class="sg-label">Hardware &amp; Embedded</p>
+      <div class="skill-row">
+        <div class="skill-chip"><span class="chip-dot cdc"></span>Arduino Nano</div>
+        <div class="skill-chip"><span class="chip-dot cdp"></span>IR Sensor Array</div>
+        <div class="skill-chip"><span class="chip-dot cdo"></span>L298N Motor Driver</div>
+        <div class="skill-chip"><span class="chip-dot cdg"></span>DC Motors</div>
+        <div class="skill-chip"><span class="chip-dot cdp"></span>Robotics Prototyping</div>
+      </div>
+    </div>
+    <div class="skill-group reveal">
+      <p class="sg-label">Currently Exploring</p>
+      <div class="skill-row">
+        <div class="skill-chip" style="border-style:dashed;opacity:.7"><span class="chip-dot cdp"></span>TypeScript</div>
+        <div class="skill-chip" style="border-style:dashed;opacity:.7"><span class="chip-dot cdc"></span>Next.js</div>
+        <div class="skill-chip" style="border-style:dashed;opacity:.7"><span class="chip-dot cdg"></span>DSA (Striver's Sheet)</div>
+        <div class="skill-chip" style="border-style:dashed;opacity:.7"><span class="chip-dot cdo"></span>System Design Basics</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="sec-head reveal">
+    <p class="sec-tag">// projects.filter(built_by_me)</p>
+    <h2 class="sec-title">What I've <em>Built</em></h2>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="proj-grid">
+
+    <!-- Project 1: SafeCircle -->
+    <div class="proj-card reveal">
+      <div class="proj-header">
+        <span class="proj-idx">PROJECT_01</span>
+        <span class="proj-badge badge-web">Web App</span>
+      </div>
+      <h3>SafeCircle — Women Safety App</h3>
+      <p>A real-world web application providing quick emergency assistance for women. Features user registration, secure data storage, and a responsive UI focused on practical safety use-cases — built because the problem actually matters.</p>
+      <div class="proj-techs">
+        <span class="tech tech-p">HTML</span>
+        <span class="tech tech-c">CSS</span>
+        <span class="tech tech-p">JavaScript</span>
+        <span class="tech tech-c">Node.js</span>
+        <span class="tech tech-p">MySQL</span>
+      </div>
+      <div class="proj-foot">
+        <a class="proj-link" href="https://github.com/NeuralSweta" target="_blank">GitHub →</a>
+        <span class="proj-highlight">Full-stack · Solo built</span>
+      </div>
+    </div>
+
+    <!-- Project 2: Line Follower Robot -->
+    <div class="proj-card reveal">
+      <div class="proj-header">
+        <span class="proj-idx">PROJECT_02</span>
+        <span class="proj-badge badge-hw">Hardware</span>
+      </div>
+      <h3>Autonomous Line Follower Robot</h3>
+      <p>Designed and built a fully autonomous robot for <strong style="color:var(--text);font-weight:500">IIT Techfest Zonals (Meshmerise) at IIIT Delhi</strong>. Used an 8-channel IR sensor array for real-time path detection with Embedded C control logic for dynamic motor adjustments.</p>
+      <div class="proj-techs">
+        <span class="tech tech-c">Arduino Nano</span>
+        <span class="tech tech-p">Embedded C</span>
+        <span class="tech tech-c">IR Sensors</span>
+        <span class="tech tech-p">L298N Driver</span>
+        <span class="tech tech-c">DC Motors</span>
+      </div>
+      <div class="proj-foot">
+        <a class="proj-link" href="https://github.com/NeuralSweta" target="_blank">GitHub →</a>
+        <span class="proj-highlight">Competed @ IIT Techfest</span>
+      </div>
+    </div>
+
+    <!-- Coming soon card -->
+    <div class="proj-card reveal" style="border-style:dashed;opacity:.55;cursor:default">
+      <div class="proj-header">
+        <span class="proj-idx">PROJECT_03</span>
+        <span class="proj-badge badge-web">Coming Soon</span>
+      </div>
+      <h3>Next Build — In Progress</h3>
+      <p>Currently working on a MERN stack project. Learning, iterating, and shipping — the next one is on its way.</p>
+      <div class="proj-techs">
+        <span class="tech tech-p">React</span>
+        <span class="tech tech-c">Node.js</span>
+        <span class="tech tech-p">MongoDB</span>
+      </div>
+      <div class="proj-foot">
+        <span class="proj-link" style="cursor:default;opacity:.5">Uploading soon ✦</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="sec-head reveal">
+    <p class="sec-tag">// experience.log</p>
+    <h2 class="sec-title">Experience &amp; <em>Involvement</em></h2>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="exp-wrap">
+
+    <div class="exp-item reveal">
+      <div class="exp-dot-wrap"><div class="exp-dot"></div></div>
+      <div class="exp-body">
+        <div class="exp-meta">
+          <span class="exp-year">2024 – Present</span>
+          <span class="exp-org">Galgotias University</span>
+        </div>
+        <h4>Robotics Club — Member</h4>
+        <ul>
+          <li>Built and competed with an autonomous line follower robot at IIT Techfest Zonals (Meshmerise) held at IIIT Delhi</li>
+          <li>Worked hands-on with Arduino, IR sensors, motor drivers, and embedded C in a competitive, time-constrained environment</li>
+          <li>Gained practical experience in hardware debugging, sensor calibration, and prototype testing</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-dot-wrap"><div class="exp-dot"></div></div>
+      <div class="exp-body">
+        <div class="exp-meta">
+          <span class="exp-year">2024 – Present</span>
+          <span class="exp-org">Galgotias University</span>
+        </div>
+        <h4>Entrepreneurship Cell (E-Cell) — Tech &amp; Marketing Teams</h4>
+        <ul>
+          <li>Active member of both the Tech Team and Marketing Team — a rare combination that bridges technical and communication skills</li>
+          <li>Contributed to organizing and promoting tech events and entrepreneurship initiatives on campus</li>
+          <li>Collaborated across cross-functional teams, strengthening both leadership and execution abilities</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-dot-wrap"><div class="exp-dot" style="opacity:.45;background:linear-gradient(135deg,#a78bfa,#67e8f9)"></div></div>
+      <div class="exp-body" style="border-style:dashed;opacity:.6">
+        <div class="exp-meta">
+          <span class="exp-year">2025 – Target</span>
+        </div>
+        <h4>Developer Internship — Goal</h4>
+        <p>Actively building projects and strengthening DSA to land a developer internship. Open to web development, full-stack, and embedded systems roles.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- RESUME -->
+<section id="resume">
+  <div class="sec-head reveal">
+    <p class="sec-tag">// sweta.getResume()</p>
+    <h2 class="sec-title">My <em>Resume</em></h2>
+    <div class="sec-rule"></div>
+  </div>
+  <div style="max-width:600px;margin:0 auto" class="reveal">
+    <div class="contact-card" style="text-align:center">
+      <p style="margin-bottom:2rem">A snapshot of my projects, skills, certifications, and involvement — built honestly to reflect where I am and where I'm headed.</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a class="btn-fill" href="https://drive.google.com/file/d/1he1ZmrDLuCMMakSVs3XRZWriRQ9xz8AB/view?usp=drive_link" target="_blank">View Resume ↗</a>
+        <a class="btn-ghost" href="https://drive.google.com/uc?export=download&id=1he1ZmrDLuCMMakSVs3XRZWriRQ9xz8AB" target="_blank">Download PDF</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPETITIVE / DSA -->
+<section id="competitive">
+  <div class="sec-head reveal">
+    <p class="sec-tag">// dsa.progress()</p>
+    <h2 class="sec-title">DSA &amp; <em>Competitive</em></h2>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="cp-grid">
+    <div class="cp-card reveal">
+      <div class="cp-num">Active</div>
+      <div class="cp-label">LeetCode</div>
+      <div class="cp-platform">@Swetajha_11</div>
+    </div>
+    <div class="cp-card reveal">
+      <div class="cp-num">Active</div>
+      <div class="cp-label">GeeksForGeeks</div>
+      <div class="cp-platform">Practising daily</div>
+    </div>
+    <div class="cp-card reveal">
+      <div class="cp-num">Codolio</div>
+      <div class="cp-label">Profile Hub</div>
+      <div class="cp-platform">@SwetaJha_11</div>
+    </div>
+    <div class="cp-card reveal">
+      <div class="cp-num">2nd Yr</div>
+      <div class="cp-label">Early Stage</div>
+      <div class="cp-platform">Consistent grind 💪</div>
+    </div>
+  </div>
+  <div class="cp-links reveal">
+    <a class="cp-link cpl-p" href="https://leetcode.com/u/Swetajha_11/" target="_blank">LeetCode Profile →</a>
+    <a class="cp-link cpl-c" href="https://codolio.com/profile/SwetaJha_11" target="_blank">Codolio Profile →</a>
+    <a class="cp-link cpl-p" href="https://github.com/NeuralSweta" target="_blank">GitHub →</a>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section id="certifications">
+  <div class="sec-head reveal">
+    <p class="sec-tag">// certifications.load()</p>
+    <h2 class="sec-title">Certs &amp; <em>Achievements</em></h2>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="cert-grid">
+    <div class="cert-card reveal">
+      <div class="cert-icon">🗄️</div>
+      <div class="cert-info">
+        <strong>Database Programming with SQL</strong>
+        <span>Oracle Academy</span>
+      </div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">⚡</div>
+      <div class="cert-info">
+        <strong>WIE-HackEarth 2025</strong>
+        <span>IEEE · Galgotias University</span>
+      </div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">☕</div>
+      <div class="cert-info">
+        <strong>Java &amp; DSA</strong>
+        <span>HCL GUVI</span>
+      </div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">🤖</div>
+      <div class="cert-info">
+        <strong>TechFest Delhi Edition — GenAI</strong>
+        <span>HCL GUVI</span>
+      </div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">🏆</div>
+      <div class="cert-info">
+        <strong>IIT Techfest Zonals Participant</strong>
+        <span>Meshmerise · IIIT Delhi</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="sec-head reveal">
+    <p class="sec-tag">// sweta.contact(you)</p>
+    <h2 class="sec-title">Get in <em>Touch</em></h2>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="contact-inner reveal">
+    <div class="contact-card">
+      <p>I'm open to internship opportunities, collaborations, and interesting conversations. Whether it's a project, an opportunity, or just a hello — reach out!</p>
+      <div class="contact-grid">
+        <a class="c-link" href="mailto:swetajhaocial11@gmail.com">
+          <div class="c-icon">📧</div>
+          <div class="c-info"><strong>Email</strong><span>swetajhaocial11@gmail.com</span></div>
+        </a>
+        <a class="c-link" href="https://www.linkedin.com/in/sweta-jha-ab1a8b35b/" target="_blank">
+          <div class="c-icon">💼</div>
+          <div class="c-info"><strong>LinkedIn</strong><span>sweta-jha-ab1a8b35b</span></div>
+        </a>
+        <a class="c-link" href="https://github.com/NeuralSweta" target="_blank">
+          <div class="c-icon">🐙</div>
+          <div class="c-info"><strong>GitHub</strong><span>NeuralSweta</span></div>
+        </a>
+        <a class="c-link" href="https://codolio.com/profile/SwetaJha_11" target="_blank">
+          <div class="c-icon">📊</div>
+          <div class="c-info"><strong>Codolio</strong><span>SwetaJha_11</span></div>
+        </a>
+      </div>
+      <div class="cform">
+        <input type="text" placeholder="Your Name" />
+        <input type="email" placeholder="Your Email" />
+        <textarea placeholder="Your Message..."></textarea>
+        <button class="send-btn">SEND MESSAGE →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">SWETA JHA</div>
+  <div class="foot-copy">© 2025 · B.Tech CSE · Galgotias University · Greater Noida</div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--faint)">Built with 💜 &amp; curiosity</div>
+</footer>
+
+<script>
+// ── cursor ──
+const cur=document.getElementById('cur'),curR=document.getElementById('cur-r');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+setInterval(()=>{rx+=(mx-rx)*.14;ry+=(my-ry)*.14;curR.style.left=rx+'px';curR.style.top=ry+'px'},16);
+document.querySelectorAll('a,button,.proj-card,.cert-card,.cp-card,.exp-body,.skill-chip').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{curR.style.transform='translate(-50%,-50%) scale(1.7)';curR.style.borderColor='var(--cl)'});
+  el.addEventListener('mouseleave',()=>{curR.style.transform='translate(-50%,-50%) scale(1)';curR.style.borderColor='rgba(167,139,250,.5)'});
+});
+
+// ── starfield ──
+const cvs=document.getElementById('cvs'),ctx=cvs.getContext('2d');
+let stars=[];
+function initStars(){
+  cvs.width=window.innerWidth;cvs.height=window.innerHeight;stars=[];
+  for(let i=0;i<180;i++){stars.push({x:Math.random()*cvs.width,y:Math.random()*cvs.height,r:Math.random()*1.2+.2,vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.08,o:Math.random()*.6+.1,to:Math.random()*.6+.1,spd:Math.random()*.008+.002,purple:Math.random()>.5})}
+}
+function drawStars(){
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  stars.forEach(s=>{
+    s.o+=(s.to-s.o)*s.spd;
+    if(Math.abs(s.o-s.to)<.01)s.to=Math.random()*.6+.1;
+    s.x+=s.vx;s.y+=s.vy;
+    if(s.x<0)s.x=cvs.width;if(s.x>cvs.width)s.x=0;
+    if(s.y<0)s.y=cvs.height;if(s.y>cvs.height)s.y=0;
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=s.purple?`rgba(167,139,250,${s.o})`:`rgba(103,232,249,${s.o})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+initStars();window.addEventListener('resize',initStars);drawStars();
+
+// ── typewriter ──
+const phrases=["Building real-world web apps ⚡","Solving DSA problems daily 🧩","Robotics & embedded systems 🤖","Learning MERN stack 🌐","2nd year CSE @ Galgotias 🎓"];
+let pi=0,ci=0,del=false;
+const twEl=document.getElementById('tw');
+function type(){
+  if(!del){twEl.textContent=phrases[pi].slice(0,ci+1);ci++;if(ci===phrases[pi].length){del=true;setTimeout(type,2000);return}}
+  else{twEl.textContent=phrases[pi].slice(0,ci-1);ci--;if(ci===0){del=false;pi=(pi+1)%phrases.length}}
+  setTimeout(type,del?45:95);
+}
+type();
+
+// ── scroll reveal ──
+const ro=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+</script>
+</body>
+</html>
